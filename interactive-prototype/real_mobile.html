@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Delphantic - Mobile</title>
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0D2137;
+            font-family: 'Georgia', serif; 
+            overflow: hidden; /* App handles scrolling */
+            touch-action: pan-y; /* Prevent pinch zoom on mobile */
+        }
+
+        /* React Root acts as the screen */
+        #root {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* GLOBALS FOR APP */
+        .app-container {
+            color: #F5EDD8;
+            min-height: 100%;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            padding: 20px;
+            text-align: center;
+            pointer-events: none; 
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 0.1em;
+            margin: 10px 0;
+            font-weight: 400;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .subtitle {
+            font-family: monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            color: #2AABB5;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .bento-section {
+            position: relative;
+            z-index: 3;
+            background: linear-gradient(to bottom, transparent, #05101A 10%);
+            padding: 40px 20px 80px 20px;
+            pointer-events: auto;
+        }
+
+        .section-title {
+            font-family: monospace;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            color: #4ECDC4;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(245, 237, 216, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .bento-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .bento-card {
+            background: rgba(26, 58, 92, 0.6);
+            border: 1px solid rgba(42, 171, 181, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-tag {
+            font-family: monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: #C4A882;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+        }
+
+        .card-desc {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #A0B4C0;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .box-primary {
+            background: linear-gradient(135deg, rgba(30,95,140,0.5), rgba(13,33,55,0.9));
+            border-color: rgba(42, 171, 181, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const NeuralBackground = () => {
+            const canvasRef = useRef(null);
+            
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                
+                // Actual device width/height
+                const updateSize = () => {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                };
+                updateSize();
+                window.addEventListener('resize', updateSize);
+
+                let particles = [];
+                let touch = { x: null, y: null, radius: 150 };
+
+                const handleTouchMove = (e) => {
+                    touch.x = e.touches[0].clientX;
+                    touch.y = e.touches[0].clientY;
+                };
+                const handleTouchEnd = () => {
+                    touch.x = null;
+                    touch.y = null;
+                };
+
+                const rootEl = document.getElementById('root');
+                rootEl.addEventListener('touchmove', handleTouchMove);
+                rootEl.addEventListener('touchend', handleTouchEnd);
+                
+                // Keep mouse for hybrid testing
+                rootEl.addEventListener('mousemove', (e) => {
+                    touch.x = e.clientX;
+                    touch.y = e.clientY;
+                });
+                rootEl.addEventListener('mouseleave', handleTouchEnd);
+
+                class Particle {
+                    constructor() {
+                        this.size = Math.random() * 1.5 + 0.5;
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.vx = (Math.random() * 0.8) - 0.4;
+                        this.vy = (Math.random() * 0.8) - 0.4;
+                        this.color = '#C4A882';
+                    }
+                    update() {
+                        if (this.x > canvas.width || this.x < 0) this.vx *= -1;
+                        if (this.y > canvas.height || this.y < 0) this.vy *= -1;
+                        
+                        if (touch.x != null) {
+                            let dx = touch.x - this.x;
+                            let dy = touch.y - this.y;
+                            let dist = Math.sqrt(dx*dx + dy*dy);
+                            if (dist < touch.radius) {
+                                this.x += (dx / dist) * 1.0;
+                                this.y += (dy / dist) * 1.0;
+                            }
+                        }
+                        
+                        this.x += this.vx;
+                        this.y += this.vy;
+                    }
+                    draw() {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+                        ctx.fillStyle = this.color;
+                        ctx.fill();
+                    }
+                }
+
+                // Adjust particle count based on screen size (mobile performance)
+                const pCount = window.innerWidth < 600 ? 30 : 60;
+                for (let i = 0; i < pCount; i++) {
+                    particles.push(new Particle());
+                }
+
+                let animationFrameId;
+                const render = () => {
+                    ctx.fillStyle = 'rgba(13, 33, 55, 0.2)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    particles.forEach(p => {
+                        p.update();
+                        p.draw();
+                    });
+
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i; j < particles.length; j++) {
+                            let dx = particles[i].x - particles[j].x;
+                            let dy = particles[i].y - particles[j].y;
+                            let dist = dx*dx + dy*dy;
+                            
+                            if (dist < 10000) {
+                                ctx.strokeStyle = `rgba(196, 168, 130, ${1 - dist/10000})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                        
+                        if (touch.x != null) {
+                            let tdx = particles[i].x - touch.x;
+                            let tdy = particles[i].y - touch.y;
+                            let tdist = tdx*tdx + tdy*tdy;
+                            
+                            if (tdist < 20000) {
+                                let op = 1 - (tdist/20000);
+                                ctx.strokeStyle = `rgba(42, 171, 181, ${op})`; 
+                                ctx.lineWidth = op * 2;
+                                ctx.beginPath();
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(touch.x, touch.y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    animationFrameId = requestAnimationFrame(render);
+                };
+                render();
+
+                return () => {
+                    cancelAnimationFrame(animationFrameId);
+                    window.removeEventListener('resize', updateSize);
+                    rootEl.removeEventListener('touchmove', handleTouchMove);
+                    rootEl.removeEventListener('touchend', handleTouchEnd);
+                };
+            }, []);
+
+            return <canvas ref={canvasRef} />;
+        };
+
+        const BentoCard = ({ tag, title, desc, primary }) => (
+            <div className={`bento-card ${primary ? 'box-primary' : ''}`}>
+                <div className="card-tag">{tag}</div>
+                <div className="card-title">{title}</div>
+                <p className="card-desc">{desc}</p>
+                {primary && <div style={{textAlign: 'right', color: '#2AABB5', fontSize: '1.5rem', marginTop: '10px'}}>◈</div>}
+            </div>
+        );
+
+        const Logo = () => (
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                <defs>
+                    <radialGradient id="oceanGrad" cx="40%" cy="40%" r="60%">
+                        <stop offset="0%" stopColor="#2AABB5" stopOpacity="0.9" />
+                        <stop offset="60%" stopColor="#1E5F8C" />
+                        <stop offset="100%" stopColor="#0D2137" />
+                    </radialGradient>
+                </defs>
+                <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" fill="url(#oceanGrad)" stroke="#4ECDC4" strokeWidth="1" strokeOpacity="0.4" />
+                <path d="M28,52 Q35,38 50,36 Q65,34 72,44 Q78,52 70,58 Q62,64 52,60 Q44,57 48,50 Q52,44 58,46 Q63,48 60,53" stroke="#F5EDD8" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.95" />
+                <path d="M28,52 Q22,46 20,40 M28,52 Q24,58 22,64" stroke="#F5EDD8" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.8" />
+                <circle cx="64" cy="45" r="1.5" fill="#F5EDD8" opacity="0.9" />
+            </svg>
+        );
+
+        const App = () => {
+            const [scrollY, setScrollY] = useState(0);
+
+            useEffect(() => {
+                const rootEl = document.getElementById('root');
+                const handleScroll = () => setScrollY(rootEl.scrollTop);
+                rootEl.addEventListener('scroll', handleScroll);
+                return () => rootEl.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <div className="app-container">
+                    <NeuralBackground />
+                    
+                    <section className="hero">
+                        <div style={{
+                            transform: `translateY(-${scrollY * 0.3}px)`,
+                            opacity: Math.max(0, 1 - scrollY * 0.003),
+                            pointerEvents: 'auto'
+                        }}>
+                            <div className="logo-container">
+                                <Logo />
+                            </div>
+                            <h1>DELPHANTIC CO.</h1>
+                            <p className="subtitle">Akıllı İş Platformu</p>
+                        </div>
+                    </section>
+
+                    <section className="bento-section">
+                        <div className="section-title">OTONOM EKOSİSTEM MODÜLLERİ</div>
+                        <div className="bento-grid">
+                            <BentoCard 
+                                primary={true}
+                                tag="SEKTÖR: GAYRİMENKUL"
+                                title="Kernal Real Estate"
+                                desc="Otonom Google Drive Veri Yutma Motoru ve 1.000+ Acente için No-UI Satış Asistanı."
+                            />
+                            <BentoCard 
+                                tag="ÇEKİRDEK"
+                                title="Enterprise ERP"
+                                desc="Kaynak planlama, finans ve stok otomasyonu için ana komuta merkezi."
+                            />
+                            <BentoCard 
+                                tag="KAYNAK"
+                                title="Kernal HR"
+                                desc="İnsan kaynakları ve bordro süreçlerinde otonom kararlar."
+                            />
+                            <BentoCard 
+                                tag="HUKUK"
+                                title="Smart Legal"
+                                desc="Otomatik sözleşme üretimi ve komisyon/takasbank güvencesi."
+                            />
+                            <BentoCard 
+                                tag="OPERASYON"
+                                title="Kernal Task"
+                                desc="Ekipler arası veri odaklı görev yönlendirmesi."
+                            />
+                        </div>
+                    </section>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

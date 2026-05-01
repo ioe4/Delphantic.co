@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic Co. - Intelligent Business Platform</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0D2137; /* Delphantic Deep Sea */
+            overflow: hidden;
+            font-family: 'Georgia', serif; 
+            color: #F5EDD8; /* Delphantic Sand */
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            pointer-events: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+            filter: drop-shadow(0px 10px 20px rgba(0,0,0,0.5));
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            letter-spacing: 0.15em;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            font-weight: 400;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        p {
+            font-family: monospace;
+            font-size: 1.1rem;
+            letter-spacing: 0.25em;
+            color: #2AABB5; /* Delphantic Turkuaz */
+            margin: 0;
+            text-transform: uppercase;
+        }
+        
+        .sectors {
+            margin-top: 30px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            color: #C4A882; /* Delphantic Kil */
+            word-spacing: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <canvas id="networkCanvas"></canvas>
+    </div>
+
+    <div class="content">
+        <div class="logo-container">
+            <!-- Delphantic Core Logo SVG -->
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+              <defs>
+                <radialGradient id="oceanGrad" cx="40%" cy="40%" r="60%">
+                  <stop offset="0%" stop-color="#2AABB5" stop-opacity="0.9" />
+                  <stop offset="60%" stop-color="#1E5F8C" />
+                  <stop offset="100%" stop-color="#0D2137" />
+                </radialGradient>
+                <radialGradient id="glowGrad" cx="35%" cy="35%" r="50%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+                </radialGradient>
+              </defs>
+              <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" fill="url(#oceanGrad)" stroke="#4ECDC4" stroke-width="1" stroke-opacity="0.4" />
+              <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" fill="url(#glowGrad)" />
+              <path d="M28,52 Q35,38 50,36 Q65,34 72,44 Q78,52 70,58 Q62,64 52,60 Q44,57 48,50 Q52,44 58,46 Q63,48 60,53" stroke="#F5EDD8" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+              <path d="M28,52 Q22,46 20,40 M28,52 Q24,58 22,64" stroke="#F5EDD8" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8" />
+              <circle cx="64" cy="45" r="1.5" fill="#F5EDD8" opacity="0.9" />
+              <path d="M20,72 Q30,68 40,72 Q50,76 60,72 Q70,68 80,72" stroke="#4ECDC4" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5" />
+            </svg>
+        </div>
+        <h1>Delphantic</h1>
+        <p>Intelligent Business Platform</p>
+        <div class="sectors">REAL_ESTATE ERP LEGAL HR HOSPITALITY</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('networkCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        
+        // Mouse interaction
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 200 // Increased radius for neural connection
+        }
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('mouseout', function() {
+            mouse.x = undefined;
+            mouse.y = undefined;
+        });
+
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+                this.baseX = this.x;
+                this.baseY = this.y;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                // Bounce off edges
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                // Check collision/interaction with mouse (Neural Pull)
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                
+                if (mouse.x != null && distance < mouse.radius) {
+                    // Slight pull towards mouse to simulate attention/activation
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    const force = (mouse.radius - distance) / mouse.radius;
+                    
+                    this.x += forceDirectionX * force * 1.5;
+                    this.y += forceDirectionY * force * 1.5;
+                } else {
+                    // Return slowly to normal movement if pushed
+                    this.x += this.directionX;
+                    this.y += this.directionY;
+                }
+                
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000; // Denser network
+            
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 0.5;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 0.8) - 0.4;
+                let directionY = (Math.random() * 0.8) - 0.4;
+                let color = '#C4A882'; // Clay/Sand nodes
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                // Connect particles to each other
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                                 + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if (distance < (canvas.width/9) * (canvas.height/9)) {
+                        opacityValue = 1 - (distance/15000);
+                        ctx.strokeStyle = 'rgba(196, 168, 130,' + (opacityValue * 0.3) + ')'; // Faint sand lines
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+
+                // Connect particles to mouse (Neural Firing)
+                if(mouse.x != null) {
+                    let mouseDist = ((particlesArray[a].x - mouse.x) * (particlesArray[a].x - mouse.x))
+                                  + ((particlesArray[a].y - mouse.y) * (particlesArray[a].y - mouse.y));
+                    
+                    if (mouseDist < 25000) { // Interaction radius squared
+                        let mouseOpacity = 1 - (mouseDist/25000);
+                        // Delphantic Turkuaz for active neural connections
+                        ctx.strokeStyle = 'rgba(42, 171, 181,' + mouseOpacity + ')'; 
+                        ctx.lineWidth = mouseOpacity * 2; // Thicker lines closer to mouse
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // Slight trail effect
+            ctx.fillStyle = 'rgba(13, 33, 55, 0.2)'; // Deep Sea
+            ctx.fillRect(0, 0, innerWidth, innerHeight);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connect();
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>

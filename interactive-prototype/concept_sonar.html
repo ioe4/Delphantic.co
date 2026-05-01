@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic - Concept 2: Radial Sonar</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #02050A; font-family: 'Georgia', serif; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .content {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 2; text-align: center; color: #F5EDD8; pointer-events: none;
+            background: rgba(2, 5, 10, 0.6);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(42, 171, 181, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        h1 { font-size: 3.5rem; letter-spacing: 0.15em; font-weight: 400; text-shadow: 0 10px 30px rgba(0,0,0,0.8); margin: 0; }
+        p { font-family: monospace; letter-spacing: 0.3em; color: #4ECDC4; margin-top: 10px; }
+        .tag { position: absolute; top: 30px; left: 30px; font-family: monospace; color: rgba(255,255,255,0.3); z-index: 2; letter-spacing: 0.2em; }
+    </style>
+</head>
+<body>
+    <div class="tag">CONCEPT 2: RADIAL SONAR</div>
+    <canvas id="sonarCanvas"></canvas>
+    <div class="content">
+        <h1>DELPHANTIC</h1>
+        <p>GLOBAL INTELLIGENCE</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('sonarCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let cx, cy, radius;
+
+        const resize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            cx = canvas.width / 2;
+            cy = canvas.height / 2;
+            radius = Math.max(canvas.width, canvas.height) * 0.8;
+        };
+        window.addEventListener('resize', resize);
+        resize();
+
+        let sweepAngle = 0;
+        
+        // Generate static data points (network nodes)
+        const points = [];
+        for(let i = 0; i < 400; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            // Pre-calculate angle from center [0, 2PI)
+            let pAngle = Math.atan2(y - cy, x - cx);
+            if (pAngle < 0) pAngle += Math.PI * 2;
+
+            points.push({
+                x: x,
+                y: y,
+                angle: pAngle,
+                size: Math.random() * 2 + 0.5,
+                opacity: 0
+            });
+        }
+
+        function draw() {
+            // Very dark background with fade for trailing effect
+            ctx.fillStyle = 'rgba(2, 5, 10, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 1. DRAW CONCENTRIC RINGS AND CROSSHAIRS
+            ctx.strokeStyle = 'rgba(42, 171, 181, 0.08)'; // Very faint turkuaz
+            ctx.lineWidth = 1;
+            
+            // Rings
+            const ringCount = 6;
+            for(let i=1; i<=ringCount; i++) {
+                ctx.beginPath();
+                ctx.arc(cx, cy, (radius/ringCount) * i, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Crosshairs
+            ctx.beginPath();
+            ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height);
+            ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy);
+            ctx.stroke();
+
+            // 2. MOVE SWEEP
+            sweepAngle += 0.015; // Sweep speed
+            if (sweepAngle >= Math.PI * 2) sweepAngle -= Math.PI * 2;
+            
+            // 3. DRAW SWEEP SECTOR
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(sweepAngle);
+            
+            // The glowing tail (arc)
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius, 0, -0.6, true); // -0.6 radians behind the leading edge
+            ctx.closePath();
+            
+            // Create conic-like gradient effect using radial gradient mixed with opacity
+            const sweepGrad = ctx.createRadialGradient(0,0,0, 0,0,radius);
+            sweepGrad.addColorStop(0, 'rgba(42, 171, 181, 0.4)');
+            sweepGrad.addColorStop(1, 'rgba(42, 171, 181, 0.0)');
+            ctx.fillStyle = sweepGrad;
+            ctx.fill();
+
+            // The bright leading edge line
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(radius, 0);
+            ctx.strokeStyle = 'rgba(78, 205, 196, 0.9)'; // Aqua
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#4ECDC4';
+            ctx.stroke();
+            
+            ctx.restore();
+
+            // 4. ILLUMINATE DATA POINTS
+            points.forEach(p => {
+                // Calculate angular distance
+                let diff = sweepAngle - p.angle;
+                // Handle wrap-around (e.g., sweep is at 0.1, point is at 6.2)
+                if (diff < 0) diff += Math.PI * 2;
+
+                // If point is within the tail width (0 to 0.6 radians behind leading edge)
+                if (diff >= 0 && diff <= 0.6) {
+                    p.opacity = 1 - (diff / 0.6); // Peak opacity at 0, fading to 0 at 0.6
+                } else {
+                    p.opacity *= 0.96; // Fade out slowly when outside the tail
+                }
+                
+                if (p.opacity > 0.02) {
+                    ctx.fillStyle = `rgba(196, 168, 130, ${p.opacity})`; // Gold/Sand
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#C4A882';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // Reset
+                    
+                    // Blueprint Connections (Draw lines to nearby points if illuminated)
+                    if (Math.random() > 0.8) {
+                        ctx.strokeStyle = `rgba(42, 171, 181, ${p.opacity * 0.4})`; // Turkuaz connections
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        // Faux connections
+                        ctx.lineTo(p.x + (Math.random()*60 - 30), p.y + (Math.random()*60 - 30));
+                        ctx.stroke();
+                    }
+                }
+            });
+            
+            requestAnimationFrame(draw);
+        }
+        
+        draw();
+    </script>
+</body>
+</html>

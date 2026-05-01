@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic - Liquid Intelligence</title>
+    <style>
+        /* Base Setup */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05101A; font-family: 'Georgia', serif; cursor: default; overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* Fixed Background Canvases */
+        #bgCanvas { display: none; }
+        #waterCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; image-rendering: auto; filter: blur(6px); opacity: 0.95; pointer-events: none; }
+        #dolphinCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 0; filter: blur(4px); pointer-events: none; }
+        
+        /* A dark overlay that gets darker as you scroll down for readability */
+        .scroll-fade { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(to bottom, transparent, rgba(5, 16, 26, 0.9)); z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+
+        /* UI OVERLAYS (Fixed) */
+        .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 100; pointer-events: none; }
+        .tag { position: absolute; top: 40px; left: 40px; font-family: monospace; color: rgba(255,255,255,0.3); letter-spacing: 0.2em; pointer-events: auto; }
+        .menu-btn { position: absolute; top: 40px; right: 40px; width: 40px; height: 30px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 8px; cursor: pointer; pointer-events: auto; z-index: 101; }
+        .menu-btn span { height: 2px; background-color: #F5EDD8; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .menu-btn span:nth-child(1) { width: 35px; }
+        .menu-btn span:nth-child(2) { width: 20px; }
+        .menu-btn:hover span { width: 35px; background-color: #4ECDC4; }
+        .menu-btn.active span:nth-child(1) { transform: translateY(5px) rotate(45deg); width: 35px; }
+        .menu-btn.active span:nth-child(2) { transform: translateY(-5px) rotate(-45deg); width: 35px; }
+        .menu-dropdown { position: absolute; top: 90px; right: 40px; width: 280px; background: rgba(8, 20, 33, 0.6); border: 1px solid rgba(42, 171, 181, 0.15); border-radius: 16px; backdrop-filter: blur(20px); padding: 20px 0; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .menu-dropdown.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .menu-item { padding: 16px 30px; font-family: monospace; letter-spacing: 0.2em; font-size: 0.8rem; color: #A0B4C0; cursor: pointer; transition: 0.3s; border-left: 0px solid #4ECDC4; }
+        .menu-item:hover { color: #F5EDD8; background: linear-gradient(90deg, rgba(42, 171, 181, 0.15), transparent); padding-left: 40px; border-left: 4px solid #4ECDC4; }
+        
+        .ticket-btn { position: absolute; bottom: 40px; right: 40px; width: 64px; height: 74px; background: rgba(13, 33, 55, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; justify-content: center; align-items: center; cursor: pointer; pointer-events: auto; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ticket-btn:hover { background: rgba(42, 171, 181, 0.3); transform: translateY(-5px) scale(1.05); }
+        .ticket-btn svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .ticket-btn .hex-border { stroke: rgba(42, 171, 181, 0.6); stroke-width: 2; fill: none; transition: 0.3s; }
+        .ticket-btn:hover .hex-border { stroke: #F5EDD8; }
+        .ticket-btn .dolphins { stroke: #F5EDD8; stroke-width: 3.5; stroke-linecap: round; fill: none; opacity: 0.8; transition: 0.3s; }
+        .ticket-btn:hover .dolphins { opacity: 1; stroke-width: 4; }
+
+        /* SCROLLING CONTENT ARCHITECTURE */
+        .main-wrapper { position: relative; z-index: 10; width: 100%; }
+
+        /* FOOTER (KUMSAL) */
+        .footer-section { position: relative; width: 100%; min-height: 45vh; background: linear-gradient(to bottom, #F5EDD8 0%, #D8C7A8 50%, #A59275 100%); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 60px; z-index: 20; color: #05101A; }
+        
+        .footer-wave { position: absolute; top: 0; left: 0; width: 100%; overflow: hidden; line-height: 0; transform: translateY(-99%); pointer-events: none; }
+        .footer-wave svg { position: relative; display: block; width: calc(100% + 1.3px); height: 80px; }
+        .footer-wave .sand-path { fill: #F5EDD8; }
+        
+        .footer-content { width: 80%; max-width: 1200px; display: flex; flex-direction: column; gap: 40px; padding-top: 40px; border-top: 1px solid rgba(13, 33, 55, 0.2); }
+        .footer-header h3 { font-size: 2rem; letter-spacing: 0.15em; font-weight: 400; margin: 0 0 10px 0; color: #05101A; }
+        .footer-header p { font-family: monospace; letter-spacing: 0.2em; color: #1E5F8C; font-size: 0.8rem; margin: 0; font-weight: bold; }
+        
+        .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; font-family: monospace; padding-top: 20px; }
+        .footer-grid h4 { color: #1E5F8C; letter-spacing: 0.15em; margin: 0 0 15px 0; font-size: 0.9rem; font-weight: bold; }
+        .footer-grid p { color: #2A3B4C; line-height: 1.8; font-size: 0.85rem; margin: 0; cursor: pointer; transition: 0.3s; font-weight: 500; }
+        .footer-grid p:hover { color: #05101A; }
+
+        /* Hero Section (100vh) */
+        .hero-section { position: relative; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: #F5EDD8; pointer-events: none; }
+        .logo-container { margin-bottom: 20px; filter: drop-shadow(0px 10px 20px rgba(0,0,0,0.5)); }
+        .hero-section h1 { font-size: 4rem; letter-spacing: 0.15em; font-weight: 400; text-shadow: 0 10px 30px rgba(0,0,0,0.8); margin: 0; }
+        .hero-section p { font-family: monospace; letter-spacing: 0.3em; color: #2AABB5; margin-top: 10px; }
+        
+        /* Revolut Style Scrolling Area */
+        .revolut-section { position: relative; width: 100%; min-height: 400vh; }
+        .sticky-container { position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden; pointer-events: none; display: flex; align-items: center; justify-content: flex-end; padding-right: 10%; box-sizing: border-box; }
+        
+        .mockup-wrapper { position: absolute; width: 500px; height: 600px; background: rgba(13, 33, 55, 0.4); border: 1px solid rgba(42, 171, 181, 0.2); border-radius: 24px; backdrop-filter: blur(15px); box-shadow: 0 30px 60px rgba(0,0,0,0.5); display: flex; flex-direction: column; padding: 30px; box-sizing: border-box; opacity: 0; transform: translateY(100px) scale(0.95); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .mockup-wrapper.active { opacity: 1; transform: translateY(0) scale(1); }
+        
+        .mockup-header { height: 40px; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .mockup-body { display: flex; gap: 20px; flex-grow: 1; }
+        .mockup-sidebar { width: 30%; background: rgba(0,0,0,0.2); border-radius: 12px; }
+        .mockup-content { width: 70%; display: flex; flex-direction: column; gap: 15px; }
+        .mockup-card { background: rgba(42, 171, 181, 0.1); border-radius: 12px; flex-grow: 1; position: relative; overflow: hidden; }
+        .mockup-line { position: absolute; left: 10%; right: 10%; height: 2px; background: rgba(245, 237, 216, 0.2); }
+        
+        .text-container { position: relative; z-index: 11; width: 50%; padding-left: 10%; padding-bottom: 20vh; box-sizing: border-box; }
+        .text-block { height: 100vh; display: flex; flex-direction: column; justify-content: center; opacity: 0.2; transform: translateY(40px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .text-block.active { opacity: 1; transform: translateY(0); }
+        .text-block h2 { font-size: 3.5rem; color: #F5EDD8; margin: 0 0 20px 0; font-weight: 400; letter-spacing: 0.05em; text-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        .text-block .sector { font-family: monospace; color: #C4A882; letter-spacing: 0.2em; font-size: 0.8rem; margin-bottom: 10px; }
+        .text-block p { color: #A0B4C0; font-size: 1.2rem; line-height: 1.6; max-width: 500px; }
+
+        /* Mobil ve Tablet Uyumluluğu */
+        @media (max-width: 768px) {
+            .hero-section h1 { font-size: 2.2rem; }
+            .logo-container svg { width: 70px; height: 70px; }
+            .tag { font-size: 0.6rem; top: 20px; left: 20px; }
+            .menu-btn { top: 20px; right: 20px; }
+            .menu-dropdown { top: 70px; right: 20px; width: calc(100vw - 40px); }
+            .ticket-btn { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+            
+            .sticky-container { align-items: flex-end; padding: 0 5%; padding-bottom: 10vh; }
+            .mockup-wrapper { width: 100%; height: 350px; }
+            
+            .text-container { width: 100%; padding: 0 5%; padding-top: 10vh; }
+            .text-block { justify-content: flex-start; padding-top: 15vh; }
+            .text-block h2 { font-size: 2rem; }
+            .text-block p { font-size: 1rem; }
+            
+            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+            .footer-wave svg { height: 30px; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- PHYSICS BACKGROUND -->
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="dolphinCanvas"></canvas>
+    <canvas id="waterCanvas"></canvas>
+    <div class="scroll-fade" id="scrollFade"></div>
+
+    <!-- UI LAYER (MENUS AND BUTTONS) -->
+    <div class="ui-layer">
+        <div class="tag">DELPHANTIC ECOSYSTEM</div>
+        <div class="menu-btn" onclick="toggleMenu(this)"><span></span><span></span></div>
+        <div id="dropdown" class="menu-dropdown">
+            <div class="menu-item">ÜYELİK</div>
+            <div class="menu-item">HAKKIMIZDA</div>
+            <div class="menu-item">YAZILIMLARIMIZ</div>
+        </div>
+        <div class="ticket-btn" title="Destek Talebi (Ticket)">
+            <svg viewBox="0 0 100 100">
+                <polygon class="hex-border" points="50,2 98,25 98,75 50,98 2,75 2,25"></polygon>
+                <path class="dolphins" d="M28,52 Q35,38 50,36 Q65,34 72,44 Q78,52 70,58 Q62,64 52,60 Q44,57 48,50 Q52,44 58,46 Q63,48 60,53"></path>
+            </svg>
+        </div>
+    </div>
+
+    <!-- MAIN SCROLLING ARCHITECTURE -->
+    <div class="main-wrapper">
+        
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="logo-container">
+                <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                  <defs>
+                    <radialGradient id="oceanGrad" cx="40%" cy="40%" r="60%">
+                      <stop offset="0%" stop-color="#2AABB5" stop-opacity="0.9" />
+                      <stop offset="60%" stop-color="#1E5F8C" />
+                      <stop offset="100%" stop-color="#0D2137" />
+                    </radialGradient>
+                  </defs>
+                  <polygon points="50,8 88,29 88,71 50,92 12,71 12,29" fill="url(#oceanGrad)" stroke="#4ECDC4" stroke-width="1" stroke-opacity="0.4" />
+                  <path d="M28,52 Q35,38 50,36 Q65,34 72,44 Q78,52 70,58 Q62,64 52,60 Q44,57 48,50 Q52,44 58,46 Q63,48 60,53" stroke="#F5EDD8" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+                  <path d="M28,52 Q22,46 20,40 M28,52 Q24,58 22,64" stroke="#F5EDD8" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8" />
+                  <circle cx="64" cy="45" r="1.5" fill="#F5EDD8" opacity="0.9" />
+                </svg>
+            </div>
+            <h1>DELPHANTIC CO.</h1>
+            <p>LIQUID INTELLIGENCE</p>
+        </div>
+
+        <!-- Revolut Style Parallax Section -->
+        <div class="revolut-section">
+            
+            <div class="sticky-container">
+                <div id="mock-1" class="mockup-wrapper">
+                    <div class="mockup-header"><div class="mockup-dot"></div><div class="mockup-dot"></div><div style="font-family:monospace; color:#A0B4C0; font-size:10px; margin-left:10px;">KERNAL_REAL_ESTATE_v1.2</div></div>
+                    <div class="mockup-body">
+                        <div class="mockup-sidebar"></div>
+                        <div class="mockup-content">
+                            <div class="mockup-card" style="flex:2;"><div class="mockup-line" style="top:30%;"></div><div class="mockup-line" style="top:60%;"></div></div>
+                            <div style="display:flex; gap:15px; flex:1;">
+                                <div class="mockup-card" style="background: rgba(196, 168, 130, 0.1);"></div>
+                                <div class="mockup-card"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mock-2" class="mockup-wrapper">
+                    <div class="mockup-header"><div class="mockup-dot"></div><div class="mockup-dot"></div><div style="font-family:monospace; color:#A0B4C0; font-size:10px; margin-left:10px;">ENTERPRISE_ERP_CORE</div></div>
+                    <div class="mockup-body" style="flex-direction: column;">
+                        <div style="display:flex; gap:15px; height: 30%;">
+                            <div class="mockup-card"></div><div class="mockup-card"></div><div class="mockup-card"></div>
+                        </div>
+                        <div class="mockup-card" style="flex:1;">
+                            <div class="mockup-line" style="top:20%; background:rgba(42, 171, 181, 0.4);"></div>
+                            <div class="mockup-line" style="top:40%; background:rgba(42, 171, 181, 0.4);"></div>
+                            <div class="mockup-line" style="top:60%; background:rgba(42, 171, 181, 0.4);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="mock-3" class="mockup-wrapper">
+                    <div class="mockup-header"><div class="mockup-dot"></div><div class="mockup-dot"></div><div style="font-family:monospace; color:#A0B4C0; font-size:10px; margin-left:10px;">KERNAL_HR_AUTONOMY</div></div>
+                    <div class="mockup-body" style="gap:30px;">
+                        <div class="mockup-content" style="width: 50%;">
+                            <div class="mockup-card" style="border-radius: 50%; height: 150px; width: 150px; align-self: center; border: 4px solid rgba(42, 171, 181, 0.2);"></div>
+                            <div class="mockup-line" style="position:relative; width: 80%; margin: 0 auto; left:0;"></div>
+                        </div>
+                        <div class="mockup-sidebar" style="width: 50%;"></div>
+                    </div>
+                </div>
+                
+                <div id="mock-4" class="mockup-wrapper">
+                    <div class="mockup-header"><div class="mockup-dot"></div><div class="mockup-dot"></div><div style="font-family:monospace; color:#A0B4C0; font-size:10px; margin-left:10px;">SMART_LEGAL_CONTRACTS</div></div>
+                    <div class="mockup-body" style="flex-direction: column; align-items:center;">
+                        <div class="mockup-card" style="width: 80%; height: 80%; background: rgba(245, 237, 216, 0.05);">
+                            <div class="mockup-line" style="top:15%; width:40%; left:10%;"></div>
+                            <div class="mockup-line" style="top:25%; width:70%; left:10%;"></div>
+                            <div class="mockup-line" style="top:35%; width:60%; left:10%;"></div>
+                            <div class="mockup-line" style="top:45%; width:75%; left:10%;"></div>
+                            <div style="position:absolute; bottom:20px; right:20px; width:40px; height:40px; border-radius:50%; border:2px dashed #4ECDC4;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-container">
+                <div class="text-block" data-target="mock-1">
+                    <div class="sector">SEKTÖR: GAYRİMENKUL</div>
+                    <h2>Kernal Real Estate</h2>
+                    <p>Google Drive üzerinden otonom veri yutma motoru. 1.000+ Acente için arayüzsüz (No-UI) satış ve operasyon asistanı.</p>
+                </div>
+                <div class="text-block" data-target="mock-2">
+                    <div class="sector">ÇEKİRDEK YAPI</div>
+                    <h2>Enterprise ERP</h2>
+                    <p>Kaynak planlama, finans ve stok otomasyonu için ana komuta merkezi. Klasik hantal ERP'lerin aksine sıvı ve uyarlanabilir.</p>
+                </div>
+                <div class="text-block" data-target="mock-3">
+                    <div class="sector">İNSAN KAYNAKLARI</div>
+                    <h2>Kernal HR</h2>
+                    <p>Çalışan performansı, izinler ve bordro süreçlerinde otonom kararlar alan insan kaynakları ağ geçidi.</p>
+                </div>
+                <div class="text-block" data-target="mock-4">
+                    <div class="sector">HUKUK & FİNANS</div>
+                    <h2>Smart Legal</h2>
+                    <p>Otomatik sözleşme üretimi, takasbank güvencesi ve komisyon dağıtımını güvence altına alan hukuki altyapı.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER (KUMSAL) -->
+        <div class="footer-section">
+            <!-- Gerçekçi Kum Kıyısı -->
+            <div class="footer-wave">
+                <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                    <path class="sand-path" d="M0,32L60,42.7C120,53,240,75,360,74.7C480,75,600,53,720,48C840,43,960,53,1080,58.7C1200,64,1320,64,1380,64L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
+                </svg>
+            </div>
+            
+            <div class="footer-content">
+                <div class="footer-header">
+                    <h3>DELPHANTIC CO.</h3>
+                    <p>LIQUID INTELLIGENCE & AUTONOMOUS B2B ECOSYSTEM</p>
+                </div>
+                <div class="footer-grid">
+                    <div>
+                        <h4>LOKASYON</h4>
+                        <p>Silicon Valley, CA<br>Girne Ofisi, KKTC</p>
+                    </div>
+                    <div>
+                        <h4>İLETİŞİM</h4>
+                        <p>hello@delphantic.com<br>+1 (555) 000-0000</p>
+                    </div>
+                    <div>
+                        <h4>LEGAL</h4>
+                        <p>Gizlilik Politikası<br>Kullanım Şartları<br>KVKK & GDPR Metni</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu(btn) {
+            btn.classList.toggle('active');
+            document.getElementById('dropdown').classList.toggle('active');
+        }
+
+        const textBlocks = document.querySelectorAll('.text-block');
+        const mockups = document.querySelectorAll('.mockup-wrapper');
+        const scrollFade = document.getElementById('scrollFade');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-40% 0px -40% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    textBlocks.forEach(tb => tb.classList.remove('active'));
+                    entry.target.classList.add('active');
+                    
+                    const targetId = entry.target.getAttribute('data-target');
+                    mockups.forEach(m => m.classList.remove('active'));
+                    document.getElementById(targetId).classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        textBlocks.forEach(block => observer.observe(block));
+
+        window.addEventListener('scroll', () => {
+            const scrollPercent = Math.min(1, window.scrollY / (window.innerHeight * 0.8));
+            scrollFade.style.opacity = scrollPercent;
+        });
+
+        const SCALE = 4;
+        const waterCanvas = document.getElementById('waterCanvas');
+        const waterCtx = waterCanvas.getContext('2d', { willReadFrequently: true });
+        const bgCanvas = document.getElementById('bgCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        const dCanvas = document.getElementById('dolphinCanvas');
+        const dCtx = dCanvas.getContext('2d');
+
+        let width, height, buffer1, buffer2, bgData, screenData;
+
+        function initWater() {
+            width = Math.floor(window.innerWidth / SCALE);
+            height = Math.floor(window.innerHeight / SCALE);
+            
+            waterCanvas.width = width; waterCanvas.height = height;
+            bgCanvas.width = width; bgCanvas.height = height;
+            dCanvas.width = window.innerWidth; dCanvas.height = window.innerHeight;
+
+            buffer1 = new Float32Array(width * height);
+            buffer2 = new Float32Array(width * height);
+
+            drawBackground();
+            
+            bgData = bgCtx.getImageData(0, 0, width, height);
+            screenData = waterCtx.createImageData(width, height);
+        }
+
+        function drawBackground() {
+            bgCtx.fillStyle = '#05101A'; bgCtx.fillRect(0, 0, width, height);
+            for (let i = 0; i < 3; i++) {
+                const cx = width / 2 + Math.sin(i * 2) * (width * 0.3);
+                const cy = height / 2 + Math.cos(i) * (height * 0.4);
+                const radius = width * 0.6;
+                const gradient = bgCtx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+                if (i === 0) gradient.addColorStop(0, 'rgba(30, 95, 140, 0.4)'); 
+                if (i === 1) gradient.addColorStop(0, 'rgba(42, 171, 181, 0.2)'); 
+                if (i === 2) gradient.addColorStop(0, 'rgba(13, 33, 55, 0.8)'); 
+                gradient.addColorStop(1, 'transparent');
+                bgCtx.fillStyle = gradient; bgCtx.beginPath(); bgCtx.arc(cx, cy, radius, 0, Math.PI * 2); bgCtx.fill();
+            }
+        }
+
+        function drop(x, y, radius, strength) {
+            x = Math.floor(x / SCALE); y = Math.floor(y / SCALE);
+            for (let j = -radius; j <= radius; j++) {
+                for (let i = -radius; i <= radius; i++) {
+                    if (i * i + j * j <= radius * radius) {
+                        let tx = x + i; let ty = y + j;
+                        if (tx > 0 && tx < width && ty > 0 && ty < height) { buffer1[tx + ty * width] = strength; }
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('resize', initWater);
+        let isMouseDown = false;
+        
+        window.addEventListener('mousedown', (e) => { 
+            if(e.target.closest('.ui-layer')) return; 
+            isMouseDown = true; drop(e.clientX, e.clientY, 6, 400); 
+        });
+        window.addEventListener('mouseup', () => isMouseDown = false);
+        window.addEventListener('mousemove', (e) => {
+            if(e.target.closest('.ui-layer')) return;
+            if (isMouseDown) drop(e.clientX, e.clientY, 3, 200);
+            else drop(e.clientX, e.clientY, 2, 100); 
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if(e.target.closest('.ui-layer')) return;
+            drop(e.touches[0].clientX, e.touches[0].clientY, 6, 400); 
+        }, { passive: true });
+        window.addEventListener('touchmove', (e) => {
+            if(e.target.closest('.ui-layer')) return;
+            drop(e.touches[0].clientX, e.touches[0].clientY, 3, 200); 
+        }, { passive: true });
+
+        const dolphinPath = new Path2D("M28,52 Q35,38 50,36 Q65,34 72,44 Q78,52 70,58 Q62,64 52,60 Q44,57 48,50 Q52,44 58,46 Q63,48 60,53 M28,52 Q22,46 20,40 M28,52 Q24,58 22,64");
+        class Dolphin {
+            constructor(x, y, scale, speed, phase, direction) { this.x = x; this.baseY = y; this.scale = scale; this.speed = speed; this.phase = phase; this.direction = direction; }
+            draw(time) {
+                this.x += this.speed * this.direction;
+                if (this.x < -300) { this.direction = 1; this.x = -300; } else if (this.x > dCanvas.width + 300) { this.direction = -1; this.x = dCanvas.width + 300; }
+                this.y = this.baseY + Math.sin(time * 0.001 + this.phase) * 60;
+                const slope = Math.cos(time * 0.001 + this.phase) * 0.08 * this.direction;
+                dCtx.save(); dCtx.translate(this.x, this.y); dCtx.rotate(slope);
+                dCtx.scale(this.direction * this.scale, this.scale); dCtx.translate(-50, -50); 
+                dCtx.strokeStyle = 'rgba(13, 33, 55, 0.8)'; dCtx.lineWidth = 4; dCtx.lineCap = 'round'; dCtx.stroke(dolphinPath);
+                dCtx.restore();
+            }
+        }
+        const dolphins = [
+            new Dolphin(-200, window.innerHeight * 0.4, 2.5, 0.8, 0, 1),        
+            new Dolphin(window.innerWidth + 200, window.innerHeight * 0.7, 1.8, 1.2, 0.5, -1) 
+        ];
+
+        let time = 0;
+        function renderPhysics() {
+            dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+            dolphins.forEach(d => d.draw(time));
+
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    let i = x + y * width;
+                    buffer2[i] = ((buffer1[i - 1] + buffer1[i + 1] + buffer1[i - width] + buffer1[i + width]) / 2) - buffer2[i];
+                    buffer2[i] *= 0.94; 
+                    
+                    let dataIndex = i * 4;
+                    let xOffset = Math.floor(buffer2[i - 1] - buffer2[i + 1]);
+                    let yOffset = Math.floor(buffer2[i - width] - buffer2[i + width]);
+                    let shade = xOffset * 0.2; 
+                    
+                    let tx = Math.min(Math.max(x + xOffset, 0), width - 1);
+                    let ty = Math.min(Math.max(y + yOffset, 0), height - 1);
+                    let targetIndex = (tx + ty * width) * 4;
+                    
+                    screenData.data[dataIndex] = bgData.data[targetIndex] + shade;
+                    screenData.data[dataIndex+1] = bgData.data[targetIndex+1] + shade;
+                    screenData.data[dataIndex+2] = bgData.data[targetIndex+2] + shade; 
+                    screenData.data[dataIndex+3] = 255;
+                }
+            }
+            let temp = buffer1; buffer1 = buffer2; buffer2 = temp;
+            waterCtx.putImageData(screenData, 0, 0);
+            
+            time += 16;
+            requestAnimationFrame(renderPhysics);
+        }
+
+        initWater();
+        renderPhysics();
+        
+        setTimeout(() => {
+            const logo = document.querySelector('.logo-container svg');
+            if (logo) {
+                const rect = logo.getBoundingClientRect();
+                drop(rect.left + rect.width / 2, rect.top + rect.height / 2, 8, 1000); 
+            } else {
+                drop(window.innerWidth/2, window.innerHeight/2 - 50, 8, 1000);
+            }
+        }, 1200);
+
+    </script>
+</body>
+</html>
