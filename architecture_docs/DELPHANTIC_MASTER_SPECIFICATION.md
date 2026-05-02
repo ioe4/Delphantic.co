@@ -92,7 +92,13 @@ Rakipler videolar için dışarıya dakika başı para öder (Shotstack). Biz ke
 5.  Videoyu Cloudflare CDN destekli Supabase Storage'a geri yükle.
 *Hata Çözümü:* Video üretimi hata verirse sunucuda `ffmpeg` kurulu olup olmadığını (Dockerfile içindeki `RUN apt-get install -y ffmpeg` komutunu) kontrol edin.
 
-### 3.2 Agnostik LLM Yönlendirmesi
+### 3.2 Hukuk ve Sözleşme Zekası (pgvector & RAG Mimarisi)
+Devasa PDF sözleşmelerini doğrudan GPT-4o'ya göndermek token israfıdır ve sistemi çökertir (Context Limit). 
+*   **Vektör Veritabanı:** Supabase'in yerleşik `pgvector` eklentisi KESİNLİKLE aktif edilecektir.
+*   **Parçalama (Chunking):** Yüklenen PDF'ler 500 kelimelik parçalara bölünür, açık kaynaklı (ücretsiz) embedding modelleriyle vektöre çevrilip Supabase'e kaydedilir.
+*   **RAG (Retrieval-Augmented Generation):** Kullanıcı "Bu sözleşmedeki fesih şartları neler?" dediğinde, GPT-4o'ya 100 sayfa değil, sadece vektör aramasıyla (Cosine Similarity) bulunan en ilgili 3 sayfa gönderilir. Maliyet %99 düşürülür.
+
+### 3.3 Agnostik LLM Yönlendirmesi
 Yapay zeka için doğrudan `import openai` KULLANILMAYACAKTIR.
 ```python
 # YANLIŞ VE MALİYETLİ KULLANIM (Generic Trap)
