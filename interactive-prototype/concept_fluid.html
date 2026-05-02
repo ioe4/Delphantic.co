@@ -20,10 +20,10 @@
         .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 100; pointer-events: none; }
         .tag { position: absolute; top: 40px; left: 40px; font-family: monospace; color: rgba(255,255,255,0.3); letter-spacing: 0.2em; pointer-events: auto; }
         .menu-btn { position: absolute; top: 40px; right: 40px; width: 40px; height: 30px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 8px; cursor: pointer; pointer-events: auto; z-index: 101; }
-        .menu-btn span { height: 2px; background-color: #F5EDD8; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .menu-btn span { height: 2px; background-color: #8B7355; transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .menu-btn span:nth-child(1) { width: 35px; }
         .menu-btn span:nth-child(2) { width: 20px; }
-        .menu-btn:hover span { width: 35px; background-color: #4ECDC4; }
+        .menu-btn:hover span { width: 35px; background-color: #C4A882; }
         .menu-btn.active span:nth-child(1) { transform: translateY(5px) rotate(45deg); width: 35px; }
         .menu-btn.active span:nth-child(2) { transform: translateY(-5px) rotate(-45deg); width: 35px; }
         .menu-dropdown { position: absolute; top: 90px; right: 40px; width: 280px; background: rgba(8, 20, 33, 0.6); border: 1px solid rgba(42, 171, 181, 0.15); border-radius: 16px; backdrop-filter: blur(20px); padding: 20px 0; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
@@ -32,12 +32,12 @@
         .menu-item:hover { color: #F5EDD8; background: linear-gradient(90deg, rgba(42, 171, 181, 0.15), transparent); padding-left: 40px; border-left: 4px solid #4ECDC4; }
         
         .ticket-btn { position: absolute; bottom: 40px; right: 40px; width: 64px; height: 74px; background: rgba(13, 33, 55, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; justify-content: center; align-items: center; cursor: pointer; pointer-events: auto; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .ticket-btn:hover { background: rgba(42, 171, 181, 0.3); transform: translateY(-5px) scale(1.05); }
+        .ticket-btn:hover { background: rgba(13, 33, 55, 0.6); transform: translateY(-5px) scale(1.05); }
         .ticket-btn svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .ticket-btn .hex-border { stroke: rgba(42, 171, 181, 0.6); stroke-width: 2; fill: none; transition: 0.3s; }
-        .ticket-btn:hover .hex-border { stroke: #F5EDD8; }
-        .ticket-btn .dolphins { stroke: #F5EDD8; stroke-width: 3.5; stroke-linecap: round; fill: none; opacity: 0.8; transition: 0.3s; }
-        .ticket-btn:hover .dolphins { opacity: 1; stroke-width: 4; }
+        .ticket-btn .hex-border { stroke: rgba(139, 115, 85, 0.6); stroke-width: 2; fill: none; transition: 0.3s; }
+        .ticket-btn:hover .hex-border { stroke: #8B7355; }
+        .ticket-btn .dolphins { stroke: #8B7355; stroke-width: 3.5; stroke-linecap: round; fill: none; opacity: 0.8; transition: 0.3s; }
+        .ticket-btn:hover .dolphins { opacity: 1; stroke-width: 4; stroke: #C4A882; }
 
         /* SCROLLING CONTENT ARCHITECTURE */
         .main-wrapper { position: relative; z-index: 10; width: 100%; }
