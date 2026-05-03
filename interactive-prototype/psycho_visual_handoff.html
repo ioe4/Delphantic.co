@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic Psycho-Visual Handoff</title>
+    <style>
+        :root {
+            --delph-bg: linear-gradient(135deg, #1A5B73 0%, #C4A882 100%);
+            --liquid-bg: linear-gradient(135deg, #050d17 0%, #0D2137 100%);
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #000;
+        }
+
+        #fluid-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--delph-bg);
+            background-size: 400% 400%;
+            animation: flowing 10s ease infinite;
+            transition: all 4s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1;
+        }
+
+        #fluid-canvas.liquid-state {
+            background: var(--liquid-bg);
+            background-size: 200% 200%;
+            animation: pulse-heavy 4s ease-in-out infinite;
+        }
+
+        /* Particles for Liquid State */
+        .particle {
+            position: absolute;
+            background: rgba(26, 91, 115, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s;
+            z-index: 2;
+            filter: blur(20px);
+        }
+        
+        #fluid-canvas.liquid-state .particle {
+            opacity: 1;
+        }
+
+        @keyframes flowing {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulse-heavy {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(0.6); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drop-zone {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .drop-zone:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .plus-icon {
+            color: #F5EDD8;
+            font-size: 40px;
+            font-weight: 300;
+            transition: all 0.5s;
+        }
+
+        .drop-zone.liquid-state {
+            width: 300px;
+            height: 2px;
+            border-radius: 2px;
+            background: rgba(26, 91, 115, 0.8);
+            border: none;
+            box-shadow: 0 0 40px rgba(26, 91, 115, 0.8);
+            transform: scale(1);
+            pointer-events: none;
+        }
+
+        .drop-zone.liquid-state .plus-icon {
+            opacity: 0;
+        }
+
+        #status-text {
+            color: #F5EDD8;
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-top: 40px;
+            font-weight: 300;
+            opacity: 0.6;
+            transition: all 1s;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .subtitles {
+            position: absolute;
+            bottom: 15%;
+            width: 60%;
+            text-align: center;
+            color: #F5EDD8;
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            line-height: 1.5;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="fluid-canvas">
+        <!-- Particles injected by JS -->
+    </div>
+
+    <div id="ui-layer">
+        <div class="drop-zone" id="drop-btn" onclick="startHandoff()">
+            <span class="plus-icon">+</span>
+        </div>
+        <div id="status-text">SİMÜLASYONU BAŞLATMAK İÇİN (+) BUTONUNA TIKLAYIN</div>
+    </div>
+
+    <div class="subtitles" id="subtitles"></div>
+
+    <script>
+        // Generate ambient background particles
+        const canvas = document.getElementById('fluid-canvas');
+        for(let i=0; i<15; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.width = Math.random() * 400 + 200 + 'px';
+            p.style.height = p.style.width;
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            p.style.animation = `pulse-heavy ${Math.random()*4 + 4}s infinite alternate`;
+            canvas.appendChild(p);
+        }
+
+        let isRunning = false;
+        let voices = [];
+        
+        // Load Web Speech API voices
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+        }
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices(); // Initial try
+
+        function speak(text, isLiquid) {
+            return new Promise(resolve => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Try to find a Turkish voice
+                let trVoice = voices.find(v => v.lang.includes('tr'));
+                if(trVoice) utterance.voice = trVoice;
+
+                if(isLiquid) {
+                    // Liquid Intelligence Persona (Cold, Deep, Authoritative)
+                    utterance.pitch = 0.4; 
+                    utterance.rate = 0.85;  
+                    utterance.volume = 1;
+                } else {
+                    // Delph Persona (Friendly, Active)
+                    utterance.pitch = 1.3; 
+                    utterance.rate = 1.1; 
+                    utterance.volume = 0.8;
+                }
+
+                document.getElementById('subtitles').innerText = text;
+                document.getElementById('subtitles').style.opacity = 1;
+
+                utterance.onend = () => {
+                    document.getElementById('subtitles').style.opacity = 0;
+                    resolve();
+                };
+                
+                // Cancel any ongoing speech before starting new
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+            });
+        }
+
+        async function startHandoff() {
+            if(isRunning) return;
+            isRunning = true;
+
+            // Make sure voices are loaded if it was clicked too fast
+            if (voices.length === 0) {
+                voices = window.speechSynthesis.getVoices();
+            }
+
+            const dropBtn = document.getElementById('drop-btn');
+            const statusText = document.getElementById('status-text');
+            const fluidCanvas = document.getElementById('fluid-canvas');
+
+            // --- STATE 1: KATMAN 1 (DELPH) ---
+            statusText.innerText = "SESLİ RESEPSİYON AKTİF";
+            await speak("Merhaba İnanç, ben Delph. Yüklediğin sözleşmeyi teslim aldım. Bunu hemen yönetici merkeze devrediyorum.", false);
+
+            // --- TRANSITION (THE HANDOFF) ---
+            statusText.innerText = "SIVI ZEKA'YA AKTARILIYOR...";
+            fluidCanvas.classList.add('liquid-state');
+            dropBtn.classList.add('liquid-state');
+            
+            // Wait for the heavy visual transition to complete (3 seconds)
+            await new Promise(r => setTimeout(r, 3000));
+
+            // --- STATE 2: KATMAN 2 (LIQUID INTELLIGENCE) ---
+            statusText.innerText = "SIVI ZEKA DEVREDE (KATMAN 2)";
+            await speak("Sıvı Zeka devrede. Sözleşme bende. Ancak üçüncü maddede yapısal bir anomali tespit ettim. Hukuk modelini uyandırmadan önce, işleme devam etmemi onaylıyor musun?", true);
+
+            statusText.innerText = "NİHAİ ONAYINIZ BEKLENİYOR...";
+            isRunning = false;
+        }
+    </script>
+</body>
+</html>

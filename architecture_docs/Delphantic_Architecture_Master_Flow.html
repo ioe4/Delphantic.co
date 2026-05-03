@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic Co. - Mimari İş Akışı</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050d17;
+            color: #F5EDD8;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #C4A882;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        p.subtitle {
+            color: #1A5B73;
+            margin-bottom: 40px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .diagram-container {
+            background-color: #0D2137;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border: 1px solid #1A5B73;
+            width: 90vw;
+            max-width: 1400px;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+        .download-btn {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background-color: #C4A882;
+            color: #0D2137;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(196, 168, 130, 0.3);
+        }
+        .download-btn:hover {
+            background-color: #F5EDD8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 237, 216, 0.4);
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            .diagram-container {
+                background-color: white;
+                box-shadow: none;
+                border: none;
+            }
+            .download-btn {
+                display: none;
+            }
+            h1 {
+                color: black;
+            }
+            p.subtitle {
+                color: gray;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Delphantic Co. Mimari İş Akışı</h1>
+    <p class="subtitle">THE LIQUID INTELLIGENCE CASCADE & CQRS DATABASE ARCHITECTURE</p>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+graph TD
+    %% Renk Kodları (Anayasa Tasarımına Uygun)
+    classDef user fill:#C4A882,stroke:#8B7355,stroke-width:2px,color:#0D2137,font-weight:bold;
+    classDef katman1 fill:#1A5B73,stroke:#0D2137,stroke-width:2px,color:#F5EDD8;
+    classDef katman2 fill:#0D2137,stroke:#1A5B73,stroke-width:4px,color:#F5EDD8,font-weight:bold;
+    classDef katman3 fill:#050d17,stroke:#C4A882,stroke-width:2px,color:#F5EDD8;
+    classDef db fill:#8B7355,stroke:#0D2137,stroke-width:2px,color:#F5EDD8;
+    classDef alert fill:#8b0000,stroke:#ff0000,stroke-width:3px,color:#fff,font-weight:bold;
+
+    %% 1. KULLANICI GİRİŞLERİ
+    U[Müşteri / Son Kullanıcı]:::user
+    UI[Delphantic Akışkan Arayüz - No UI]:::user
+    B2C[B2C Canlı Chatbot API<br/>Dış Tetikleyiciler]:::user
+
+    U -->|Ses, Excel, PDF Yükler| UI
+    B2C -->|Lead ve Dış Veri| UI
+
+    %% 2. KATMAN 1 (KAPIDAKİ RESEPSİYON)
+    subgraph Katman_1 ["KATMAN 1: SESLİ RESEPSİYON (Voice-First Gatekeeper)"]
+        K1_ASR["ASR Kulak: Groq Whisper<br/>(Hatasız Anlama)"]:::katman1
+        K1_TTS["TTS Ağız: OpenAI TTS-1<br/>(Akıcı Diksiyon)"]:::katman1
+        K1_Logic["Niyet Sınıflandırıcı<br/>(Cümleyi anlar, İlk Komutu paketler)"]:::katman1
+        
+        UI -->|Ham Ses ve Dosya| K1_ASR
+        K1_ASR --> K1_Logic
+        K1_Logic -.->|Basit Sohbetse| K1_TTS
+        K1_TTS -->|Sesli Yanıt| UI
+    end
+
+    %% 3. İKİ VİTESLİ VERİTABANI (CQRS)
+    subgraph Veritabani ["İKİ VİTESLİ VERİTABANI MİMARİSİ (CQRS)"]
+        DB_Shadow[("VİTES 1: GÖLGE DB (Sadece Okuma)<br/>Telefona Senkronize (SQLite)<br/>Sıfır Gecikme, Sıfır SQL")]:::db
+        DB_Core[("VİTES 2: ÇEKİRDEK DB (Ana Depo)<br/>Supabase PostgreSQL<br/>Karmaşık İlişkiler")]:::db
+        
+        DB_Core -->|Supabase Realtime WebSockets ile Anında Eşitleme| DB_Shadow
+    end
+
+    %% Katman 1 Sadece Gölgeyi Okur
+    K1_Logic -->|Basit Hafıza Sorusu: Ahmet'in dosyası nerede?| DB_Shadow
+
+    %% 4. KATMAN 2 (GÜVENLİK DUVARI VE SIVI ZEKA)
+    subgraph Katman_2 ["KATMAN 2: GERÇEK YÖNETİCİ BEYİN (The Liquid Intelligence)"]
+        K2_Brain["Model: Claude 3.5 Haiku<br/>(Ucuz, Çok Hızlı, Derin Muhakeme)"]:::katman2
+        K2_Auth["Yetki ve Finans Kontrolü<br/>(CRM modülü açık mı? Kredisi var mı?)"]:::katman2
+        K2_Anomaly["Anomali Dedektörü<br/>(Excel'de zararlı/tuhaf satır var mı?)"]:::katman2
+        K2_Prompt["Süper-Prompt Derleyici<br/>(Müşterinin kural dosyasını çeker)"]:::katman2
+        K2_Firewall["ÇİFTE SAĞIRLIK GÜVENLİK DUVARI<br/>Nihai Onay Mekanizması"]:::alert
+
+        K1_Logic ==>|Ağır İş Emri ve Dosyalar| K2_Auth
+        K2_Auth --> K2_Anomaly
+        K2_Anomaly -->|Dosya Temiz| K2_Prompt
+        K2_Prompt --> K2_Brain
+        K2_Brain -->|Tetiği Çekmeden Önce| K2_Firewall
+    end
+
+    %% Katman 2 Çekirdek DB'ye Bağlıdır
+    K2_Auth <-->|Ana Yetki Kontrolü| DB_Core
+    K2_Prompt <-->|Prompt Şablonlarını Çeker| DB_Core
+
+    %% GÖRSEL ONAY SÜRECİ
+    K2_Firewall ==>|Ekrana Kocaman Yazılı 'SATIŞ İPTAL EDİLECEK' Kartı Basar| UI
+    UI ==>|Müşteri Gözüyle Okur ve FİZİKSEL ONAY Verir| K2_Brain
+
+    %% 5. KATMAN 3 (AĞIR İŞÇİLER / UZMANLAR)
+    subgraph Katman_3 ["KATMAN 3: ÇOKLU-MODALİTE UZMANLARI (The Multi-Modal Arsenal)"]
+        K3_Legal["HUKUK & METİN<br/>Claude 3.5 Sonnet<br/>(Sıfır Halüsinasyon, Uzun Hafıza)"]:::katman3
+        K3_CRM["FİNANS & VERİ<br/>GPT-4o (Data Analysis)<br/>(Python, Pandas, Finansal Excel)"]:::katman3
+        K3_Vision["GÖRSEL ANLAMA<br/>GPT-4o Vision<br/>(Fotoğraf ve Plan Yorumlama)"]:::katman3
+        K3_Image["GÖRSEL ÜRETİM<br/>Midjourney v6 / Flux API<br/>(Gerçekçi Oda Sahneleme/Render)"]:::katman3
+        K3_Video["VİDEO ÜRETİM<br/>Runway Gen-3 / Luma<br/>(Sinematik Emlak Turları/Reklam)"]:::katman3
+        K3_Audio["SES & MÜZİK<br/>ElevenLabs / Suno<br/>(Pazarlama Dublajı, Arka Plan)"]:::katman3
+    end
+
+    %% Dağıtım (Orkestrasyon)
+    K2_Brain -->|Sözleşme / Rapor Emri| K3_Legal
+    K2_Brain -->|Hesap / Analiz Emri| K3_CRM
+    K2_Brain -->|Fotoğraf Yorumlama| K3_Vision
+    K2_Brain -->|Tasarım / Render Emri| K3_Image
+    K2_Brain -->|Pazarlama Videosu Emri| K3_Video
+    K2_Brain -->|Seslendirme Emri| K3_Audio
+
+    %% İşin Bitişi
+    K3_Legal -->|Metin Çıktısı| DB_Core
+    K3_CRM -->|Excel Çıktısı| DB_Core
+    K3_Vision -->|Yorum/Veri| DB_Core
+    K3_Image -->|Görsel Medya| DB_Core
+    K3_Video -->|Video Medya| DB_Core
+    K3_Audio -->|Ses Dosyası| DB_Core
+        </div>
+    </div>
+    
+    <button class="download-btn" onclick="window.print()">PDF Olarak İndir (Yazdır)</button>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            flowchart: {
+                curve: 'basis',
+                nodeSpacing: 50,
+                rankSpacing: 50
+            }
+        });
+    </script>
+</body>
+</html>

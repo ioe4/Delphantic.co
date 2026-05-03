@@ -1,0 +1,86 @@
+graph TD
+    %% Renk Kodları (Anayasa Tasarımına Uygun)
+    classDef user fill:#C4A882,stroke:#8B7355,stroke-width:2px,color:#0D2137,font-weight:bold;
+    classDef katman1 fill:#1A5B73,stroke:#0D2137,stroke-width:2px,color:#F5EDD8;
+    classDef katman2 fill:#0D2137,stroke:#1A5B73,stroke-width:4px,color:#F5EDD8,font-weight:bold;
+    classDef katman3 fill:#050d17,stroke:#C4A882,stroke-width:2px,color:#F5EDD8;
+    classDef db fill:#8B7355,stroke:#0D2137,stroke-width:2px,color:#F5EDD8;
+    classDef alert fill:#8b0000,stroke:#ff0000,stroke-width:3px,color:#fff,font-weight:bold;
+
+    %% 1. KULLANICI GİRİŞLERİ
+    U[Müşteri / Son Kullanıcı]:::user
+    UI[Delphantic Akışkan Arayüz]:::user
+    B2C[B2C Canlı Chatbot API]:::user
+
+    U -->|Ses, Excel, PDF| UI
+    B2C -->|Lead ve Dış Veri| UI
+
+    %% 2. KATMAN 1
+    subgraph Katman_1 ["KATMAN 1: SESLİ RESEPSİYON (Voice-First Gatekeeper)"]
+        K1_ASR["ASR Kulak: Groq Whisper"]:::katman1
+        K1_TTS["TTS Ağız: OpenAI TTS-1"]:::katman1
+        K1_Logic["Niyet Sınıflandırıcı"]:::katman1
+        
+        UI -->|Ham Ses ve Dosya| K1_ASR
+        K1_ASR --> K1_Logic
+        K1_Logic -.->|Basit Sohbetse| K1_TTS
+        K1_TTS -->|Sesli Yanıt| UI
+    end
+
+    %% 3. İKİ VİTESLİ VERİTABANI
+    subgraph Veritabani ["İKİ VİTESLİ VERİTABANI (CQRS)"]
+        DB_Shadow[("VİTES 1: GÖLGE DB<br/>(Telefona Senkronize SQLite)")]:::db
+        DB_Core[("VİTES 2: ÇEKİRDEK DB<br/>(Supabase PostgreSQL)")]:::db
+        
+        DB_Core -->|Realtime WebSockets| DB_Shadow
+    end
+
+    K1_Logic -->|Basit Okuma Sorgusu| DB_Shadow
+
+    %% 4. KATMAN 2
+    subgraph Katman_2 ["KATMAN 2: YÖNETİCİ BEYİN (Liquid Intelligence)"]
+        K2_Brain["Claude 3.5 Haiku<br/>(Derin Muhakeme)"]:::katman2
+        K2_Auth["Yetki/Finans Kontrolü"]:::katman2
+        K2_Anomaly["Anomali Dedektörü"]:::katman2
+        K2_Prompt["Süper-Prompt Derleyici"]:::katman2
+        K2_Firewall["GÖRSEL GÜVENLİK DUVARI<br/>(Nihai Onay)"]:::alert
+
+        K1_Logic ==>|Ağır İş Emri| K2_Auth
+        K2_Auth --> K2_Anomaly
+        K2_Anomaly -->|Dosya Temiz| K2_Prompt
+        K2_Prompt --> K2_Brain
+        K2_Brain -->|Tetiği Çekmeden Önce| K2_Firewall
+    end
+
+    K2_Auth <-->|Yetki Kontrolü| DB_Core
+    K2_Prompt <-->|Şablon Çekimi| DB_Core
+
+    %% GÖRSEL ONAY
+    K2_Firewall ==>|'SATIŞ İPTAL' Kartı| UI
+    UI ==>|Fiziksel ONAY| K2_Brain
+
+    %% 5. KATMAN 3
+    subgraph Katman_3 ["KATMAN 3: ÇOKLU-MODALİTE UZMANLARI"]
+        K3_Legal["HUKUK<br/>Claude 3.5 Sonnet"]:::katman3
+        K3_CRM["FİNANS<br/>GPT-4o (Data)"]:::katman3
+        K3_Vision["GÖRSEL ANLAMA<br/>GPT-4o Vision"]:::katman3
+        K3_Image["GÖRSEL ÜRETİM<br/>Flux API"]:::katman3
+        K3_Video["VİDEO ÜRETİM<br/>Runway Gen-3"]:::katman3
+        K3_Audio["SES/MÜZİK<br/>ElevenLabs"]:::katman3
+    end
+
+    %% Dağıtım
+    K2_Brain -->|Sözleşme| K3_Legal
+    K2_Brain -->|Hesap| K3_CRM
+    K2_Brain -->|Foto Analiz| K3_Vision
+    K2_Brain -->|Render| K3_Image
+    K2_Brain -->|Video| K3_Video
+    K2_Brain -->|Dublaj| K3_Audio
+
+    %% İşin Bitişi
+    K3_Legal -->|Veri Yazar| DB_Core
+    K3_CRM -->|Veri Yazar| DB_Core
+    K3_Vision -->|Veri Yazar| DB_Core
+    K3_Image -->|Veri Yazar| DB_Core
+    K3_Video -->|Veri Yazar| DB_Core
+    K3_Audio -->|Veri Yazar| DB_Core

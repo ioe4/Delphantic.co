@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">
+    <rect width="1200" height="1600" fill="#050d17" />
+    
+    <style>
+        .title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 36px; font-weight: 800; fill: #C4A882; text-anchor: middle; letter-spacing: 2px; }
+        .subtitle { font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: 400; fill: #1A5B73; text-anchor: middle; letter-spacing: 1px; }
+        .layer-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 22px; font-weight: bold; fill: #F5EDD8; }
+        .box-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: bold; fill: #C4A882; text-anchor: middle; }
+        .box-model { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #F5EDD8; text-anchor: middle; }
+        .box-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; fill: #A0B4C0; text-anchor: middle; }
+        .arrow-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 12px; font-weight: bold; fill: #C4A882; }
+        .alert-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 24px; font-weight: 900; fill: #FF4444; text-anchor: middle; letter-spacing: 1px; }
+        .alert-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #F5EDD8; text-anchor: middle; }
+    </style>
+
+    <!-- HEADER -->
+    <text x="600" y="60" class="title">DELPHANTIC CO. MİMARİ İŞ AKIŞI</text>
+    <text x="600" y="90" class="subtitle">SIVI ZEKA ŞELALESİ VE ÇOKLU-MODALİTE CEPHANELİĞİ</text>
+
+    <!-- ARROWS DEF -->
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#1A5B73" />
+        </marker>
+        <marker id="arrow-gold" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#C4A882" />
+        </marker>
+        <marker id="arrow-red" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF4444" />
+        </marker>
+    </defs>
+
+    <!-- KULLANICI -->
+    <rect x="400" y="130" width="400" height="80" rx="10" fill="#0D2137" stroke="#8B7355" stroke-width="2" stroke-dasharray="5,5"/>
+    <text x="600" y="175" class="box-title">MÜŞTERİ / AKIŞKAN ARAYÜZ (NO-UI)</text>
+    
+    <line x1="600" y1="210" x2="600" y2="260" stroke="#C4A882" stroke-width="3" marker-end="url(#arrow-gold)"/>
+    <text x="610" y="240" class="arrow-text">Ses veya Dosya Yükler</text>
+
+    <!-- KATMAN 1 -->
+    <rect x="150" y="270" width="900" height="180" rx="15" fill="#0D2137" stroke="#1A5B73" stroke-width="2"/>
+    <text x="170" y="310" class="layer-title">KATMAN 1: SESLİ RESEPSİYON (Voice-First Gatekeeper)</text>
+    <text x="170" y="335" class="box-text" text-anchor="start">Görev: Sıfır gecikme ile müşteriyi karşılamak. Veri yazamaz, SQL sorgusu çekemez. (Salt-Okunur)</text>
+    
+    <!-- K1 Nodes -->
+    <rect x="200" y="360" width="230" height="70" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="315" y="385" class="box-title">KULAK (ASR)</text>
+    <text x="315" y="405" class="box-model">Groq Whisper API</text>
+    <text x="315" y="420" class="box-text">Sıfır Hatalı Anlama</text>
+
+    <rect x="485" y="360" width="230" height="70" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="600" y="385" class="box-title">NİYET MOTORU</text>
+    <text x="600" y="405" class="box-model">Sınıflandırma Mantığı</text>
+
+    <rect x="770" y="360" width="230" height="70" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="885" y="385" class="box-title">AĞIZ (TTS)</text>
+    <text x="885" y="405" class="box-model">OpenAI TTS-1</text>
+    <text x="885" y="420" class="box-text">Kusursuz Diksiyon</text>
+
+    <!-- Lines inside K1 -->
+    <line x1="430" y1="395" x2="480" y2="395" stroke="#1A5B73" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="715" y1="395" x2="765" y2="395" stroke="#1A5B73" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <line x1="600" y1="450" x2="600" y2="510" stroke="#C4A882" stroke-width="3" marker-end="url(#arrow-gold)"/>
+    <text x="610" y="490" class="arrow-text">Ağır İş Emri (Dosya/Sözleşme)</text>
+
+    <!-- İKİ VİTESLİ VERİTABANI (CQRS) -->
+    <rect x="150" y="520" width="900" height="150" rx="15" fill="#0D2137" stroke="#8B7355" stroke-width="2"/>
+    <text x="170" y="560" class="layer-title" fill="#C4A882">İKİ VİTESLİ VERİTABANI MİMARİSİ (CQRS)</text>
+    
+    <rect x="250" y="580" width="300" height="70" rx="8" fill="#050d17" stroke="#C4A882" stroke-width="1"/>
+    <text x="400" y="605" class="box-title">VİTES 1: GÖLGE DB (SQLite)</text>
+    <text x="400" y="625" class="box-text">Katman 1 buradan saniyede okur.</text>
+
+    <rect x="650" y="580" width="300" height="70" rx="8" fill="#050d17" stroke="#C4A882" stroke-width="1"/>
+    <text x="800" y="605" class="box-title">VİTES 2: ÇEKİRDEK DB (Supabase)</text>
+    <text x="800" y="625" class="box-text">Ana depo. Katman 2/3 SQL ile buraya yazar.</text>
+
+    <!-- Sync Line -->
+    <line x1="640" y1="615" x2="560" y2="615" stroke="#C4A882" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-gold)"/>
+    <text x="600" y="600" class="arrow-text" text-anchor="middle">Realtime Senkron</text>
+
+    <line x1="600" y1="670" x2="600" y2="730" stroke="#C4A882" stroke-width="3" marker-end="url(#arrow-gold)"/>
+
+    <!-- KATMAN 2 -->
+    <rect x="150" y="740" width="900" height="180" rx="15" fill="#0D2137" stroke="#1A5B73" stroke-width="4"/>
+    <text x="170" y="780" class="layer-title">KATMAN 2: GERÇEK YÖNETİCİ BEYİN (Sıvı Zeka)</text>
+    <text x="170" y="805" class="box-text" text-anchor="start">Görev: Anomali taramak, süper-promptları derlemek, Katman 3'e iş dağıtmak.</text>
+
+    <rect x="400" y="820" width="400" height="80" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="2"/>
+    <text x="600" y="850" class="box-title">BEYİN VE ORKESTRASYON</text>
+    <text x="600" y="870" class="box-model">Model: Claude 3.5 Haiku</text>
+    <text x="600" y="885" class="box-text">Derin Muhakeme, Çok Ucuz, Hızlı</text>
+
+    <line x1="600" y1="920" x2="600" y2="980" stroke="#C4A882" stroke-width="3" marker-end="url(#arrow-gold)"/>
+    <text x="610" y="960" class="arrow-text">Tetiği Çekmeden Önce Güvenlik Duvarı Devreye Girer</text>
+
+    <!-- FIREWALL -->
+    <rect x="250" y="990" width="700" height="100" rx="10" fill="#4A1515" stroke="#FF4444" stroke-width="3"/>
+    <text x="600" y="1030" class="alert-title">ÇİFTE-SAĞIRLIK GÜVENLİK DUVARI</text>
+    <text x="600" y="1055" class="alert-text">SATIŞ İPTAL EDİLECEK</text>
+    <text x="600" y="1075" class="box-text" fill="#ffcccc">Sadece Ses Yetmez. Kullanıcı Ekranda Yazılı Onay Vermeden İşlem Geçmez.</text>
+
+    <line x1="600" y1="1090" x2="600" y2="1150" stroke="#FF4444" stroke-width="3" marker-end="url(#arrow-red)"/>
+    <text x="610" y="1130" class="arrow-text" fill="#FF4444">Fiziksel ONAY Alındı</text>
+
+    <!-- KATMAN 3 -->
+    <rect x="150" y="1160" width="900" height="340" rx="15" fill="#0D2137" stroke="#1A5B73" stroke-width="2"/>
+    <text x="170" y="1200" class="layer-title">KATMAN 3: ÇOKLU-MODALİTE CEPHANELİĞİ (Ağır İşçiler)</text>
+    
+    <!-- Row 1 -->
+    <rect x="180" y="1230" width="260" height="100" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="310" y="1260" class="box-title">HUKUK VE METİN</text>
+    <text x="310" y="1285" class="box-model">Claude 3.5 Sonnet</text>
+    <text x="310" y="1305" class="box-text">Sıfır Halüsinasyon, Uzun Hafıza</text>
+
+    <rect x="470" y="1230" width="260" height="100" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="600" y="1260" class="box-title">FİNANS VE VERİ (CRM)</text>
+    <text x="600" y="1285" class="box-model">GPT-4o (Advanced Data)</text>
+    <text x="600" y="1305" class="box-text">Python/Pandas ile Excel İşleme</text>
+
+    <rect x="760" y="1230" width="260" height="100" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="890" y="1260" class="box-title">GÖRSEL ANLAMA</text>
+    <text x="890" y="1285" class="box-model">GPT-4o Vision</text>
+    <text x="890" y="1305" class="box-text">Boş Oda Fotoğrafını Analiz Eder</text>
+
+    <!-- Row 2 -->
+    <rect x="180" y="1360" width="260" height="100" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="310" y="1390" class="box-title">GÖRSEL ÜRETİM</text>
+    <text x="310" y="1415" class="box-model">Midjourney v6 / Flux API</text>
+    <text x="310" y="1435" class="box-text">Virtual Staging ve Render</text>
+
+    <rect x="470" y="1360" width="260" height="100" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="600" y="1390" class="box-title">VİDEO ÜRETİM</text>
+    <text x="600" y="1415" class="box-model">Runway Gen-3 / Luma</text>
+    <text x="600" y="1435" class="box-text">Sinematik Reklam Videoları</text>
+
+    <rect x="760" y="1360" width="260" height="100" rx="8" fill="#050d17" stroke="#1A5B73" stroke-width="1"/>
+    <text x="890" y="1390" class="box-title">SES VE MÜZİK</text>
+    <text x="890" y="1415" class="box-model">ElevenLabs / Suno API</text>
+    <text x="890" y="1435" class="box-text">Pazarlama Dublajı ve Telifsiz Fon</text>
+
+</svg>

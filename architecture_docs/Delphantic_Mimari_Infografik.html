@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic Co. - Mimari İnfografik</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050d17;
+            color: #F5EDD8;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        h1 {
+            color: #C4A882;
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #1A5B73;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+        
+        /* Kart Stilleri */
+        .layer-box {
+            background-color: #0D2137;
+            border: 2px solid #1A5B73;
+            border-radius: 12px;
+            padding: 25px;
+            position: relative;
+        }
+        .layer-title {
+            color: #C4A882;
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #1A5B73;
+            padding-bottom: 10px;
+        }
+        .layer-desc {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #A0B4C0;
+        }
+        
+        /* Grid Sistemleri */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        /* İç Kartlar */
+        .node-card {
+            background-color: #050d17;
+            border: 1px solid #1A5B73;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .node-title {
+            color: #F5EDD8;
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .node-model {
+            color: #C4A882;
+            font-weight: 800;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .node-detail {
+            color: #8898A5;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* Güvenlik Duvarı Özel */
+        .firewall-box {
+            background-color: #4A1515;
+            border: 2px solid #FF4444;
+            text-align: center;
+        }
+        .firewall-box .layer-title {
+            color: #FF4444;
+            border-bottom-color: #8b0000;
+        }
+
+        /* Oklar */
+        .arrow-down {
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #C4A882;
+            margin: 10px auto;
+        }
+
+        .download-btn {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background-color: #C4A882;
+            color: #0D2137;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .download-btn:hover { background-color: #F5EDD8; }
+
+        @media print {
+            body { background-color: white; color: black; padding: 0; }
+            .layer-box, .node-card { background-color: #f8f9fa; border-color: #ddd; }
+            .layer-title, .node-model { color: #0056b3; }
+            h1 { color: black; }
+            .subtitle, .layer-desc, .node-detail { color: #555; }
+            .download-btn { display: none; }
+            .firewall-box { background-color: #fff0f0; border-color: red; }
+            .arrow-down { border-top-color: #ccc; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Delphantic Co.</h1>
+        <div class="subtitle">SIVI ZEKA MİMARİSİ VE YAPAY ZEKA ŞELALESİ</div>
+
+        <!-- USER INPUT -->
+        <div class="layer-box" style="text-align: center; border-style: dashed;">
+            <div class="layer-title" style="color: #F5EDD8; border: none; margin: 0;">Müşteri Arayüzü (Akışkan Tema)</div>
+            <div class="layer-desc" style="margin: 0;">Kullanıcı sesli komut verir veya dosya yükler.</div>
+        </div>
+
+        <div class="arrow-down"></div>
+
+        <!-- KATMAN 1 -->
+        <div class="layer-box">
+            <div class="layer-title">Katman 1: Sesli Resepsiyon (İlk Karşılama)</div>
+            <div class="layer-desc">Müşterinin sesini hatasız anlayan ve kusursuz diksiyonla konuşan ön kapı. Asla kendi başına ağır SQL sorgusu yazmaz veya veriyi değiştirmez (Salt-Okunur).</div>
+            <div class="grid-2">
+                <div class="node-card">
+                    <div class="node-title">KULAK (Sesi Anlama)</div>
+                    <div class="node-model">Model: Groq Whisper API</div>
+                    <div class="node-detail">Sıfır hata ile Türkçe/İngilizce sesi metne döker. Saati ~0.03$ ile inanılmaz ucuz ve ultra hızlıdır.</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">AĞIZ (Sesi Üretme)</div>
+                    <div class="node-model">Model: OpenAI TTS-1 / Deepgram</div>
+                    <div class="node-detail">Katman 2'den gelen metni kusursuz ve doğal bir vurguyla seslendirir. Dakikası ~0.015$.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down"></div>
+
+        <!-- CQRS VERITABANI -->
+        <div class="layer-box">
+            <div class="layer-title">İki Vitesli Veritabanı (CQRS Hafıza)</div>
+            <div class="layer-desc">Katman 1'in beklemeden cevap vermesi için veritabanı ikiye bölünmüştür. Supabase Realtime ile milisaniyede eşitlenirler.</div>
+            <div class="grid-2">
+                <div class="node-card">
+                    <div class="node-title">VİTES 1: Gölge Veritabanı</div>
+                    <div class="node-model">Katman 1 İçin (Cihaz İçi / SQLite)</div>
+                    <div class="node-detail">Sadece düz metinlerden oluşan basit Excel benzeri liste. Katman 1, "Ahmet'in sözleşmesi nerede?" sorusunu sıfır maliyetle saniyede buradan okur. Asla veri silemez.</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">VİTES 2: Çekirdek Veritabanı</div>
+                    <div class="node-model">Katman 2 İçin (PostgreSQL)</div>
+                    <div class="node-detail">Ağır ilişkisel veritabanı. Sadece Katman 2 (Sıvı Zeka) çapraz analiz yapacağı veya veri değiştireceği zaman bu ağır depoya bağlanır.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrow-down"></div>
+
+        <!-- KATMAN 2 -->
+        <div class="layer-box">
+            <div class="layer-title">Katman 2: Gerçek Yönetici Beyin (Sıvı Zeka)</div>
+            <div class="layer-desc">Uygulamanın asıl zekasıdır. Gelen komutları analiz eder, yetkileri kontrol eder, veritabanına sadece bu katman yazar ve görevleri Katman 3'teki uzmanlara dağıtır.</div>
+            <div class="node-card" style="margin-bottom: 15px;">
+                <div class="node-title">BEYİN VE ORKESTRASYON</div>
+                <div class="node-model">Model: Claude 3.5 Haiku</div>
+                <div class="node-detail">Müşterinin Excel'indeki hataları (anomalileri) şahin gibi yakalar, süper-promptu hazırlar. GPT-4'ten çok daha ucuz (~0.25$/1M Token) ve zekidir. Tetiği çekmeden önce Güvenlik Duvarını tetikler.</div>
+            </div>
+        </div>
+
+        <div class="arrow-down"></div>
+
+        <!-- FIREWALL -->
+        <div class="layer-box firewall-box">
+            <div class="layer-title">ÇİFTE-SAĞIRLIK GÜVENLİK DUVARI</div>
+            <div class="layer-desc" style="color: #ffcccc;">Sesli onay felaketlerini önlemek için, Katman 2 veriyi değiştirmeden önce Ekrana kocaman YAZILI BİR KART basar (Örn: "SATIŞ İPTAL EDİLECEK"). Kullanıcı fiziksel olarak onaylamadan işlem Katman 3'e geçmez.</div>
+        </div>
+
+        <div class="arrow-down"></div>
+
+        <!-- KATMAN 3 -->
+        <div class="layer-box">
+            <div class="layer-title">Katman 3: Çoklu-Modalite Cephaneliği</div>
+            <div class="layer-desc">Kullanıcı yazılı onayı verdikten sonra, Katman 2'nin uyandırdığı asıl "Ağır İşçi" canavarlardır. Her biri kendi medyasında dünya lideridir.</div>
+            <div class="grid-3">
+                <div class="node-card">
+                    <div class="node-title">HUKUK VE METİN</div>
+                    <div class="node-model">Claude 3.5 Sonnet</div>
+                    <div class="node-detail">Uzun sözleşmeleri bağlam kopmadan ve sıfır halüsinasyonla okur/yazar.</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">FİNANS VE VERİ</div>
+                    <div class="node-model">GPT-4o (Data Analysis)</div>
+                    <div class="node-detail">Arka planda Python ve Pandas kullanarak Excel işler, tahminleme yapar.</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">GÖRSEL ANLAMA</div>
+                    <div class="node-model">GPT-4o Vision</div>
+                    <div class="node-detail">Emlak fotoğraflarına bakıp "Buraya 3 boyutlu koltuk sığar" diyebilir.</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">GÖRSEL ÜRETİM</div>
+                    <div class="node-model">Flux API / Midjourney</div>
+                    <div class="node-detail">Boş oda fotoğrafını alıp ultra-gerçekçi mobilyalarla döşer (Virtual Staging).</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">VİDEO ÜRETİM</div>
+                    <div class="node-model">Runway Gen-3 / Luma</div>
+                    <div class="node-detail">Statik emlak fotoğraflarını sinematik, akıcı tanıtım reklamlarına çevirir.</div>
+                </div>
+                <div class="node-card">
+                    <div class="node-title">SES VE MÜZİK</div>
+                    <div class="node-model">ElevenLabs / Suno</div>
+                    <div class="node-detail">Videoların arkasına telifsiz müzik ve kusursuz pazarlama dublajı yapar.</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <button class="download-btn" onclick="downloadPDF()">PDF Olarak İndir (Gerçek PDF)</button>
+
+    <!-- html2pdf.js Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function downloadPDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     'Delphantic_Mimari_Infografik.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#050d17' },
+                jsPDF:        { unit: 'mm', format: 'a3', orientation: 'portrait' }
+            };
+            
+            // İndirme işlemi
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
