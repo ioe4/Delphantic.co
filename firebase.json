@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      ".git/**",
+      ".github/**",
+      "architecture_docs/**",
+      "node_modules/**",
+      "*.md",
+      "*.jsx"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/interactive-prototype/index.html"
+      }
+    ]
+  }
+}

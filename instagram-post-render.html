@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delphantic Instagram Post Renderer</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #05101A;
+            height: 100vh;
+            font-family: 'Georgia', serif;
+        }
+
+        /* 1080x1080 Instagram Post Size */
+        .instagram-post {
+            width: 1080px;
+            height: 1080px;
+            background: radial-gradient(circle at top right, #1A3A5C, #0D2137);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        }
+
+        .tagline {
+            font-family: monospace;
+            color: #4ECDC4;
+            letter-spacing: 0.3em;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            color: #F5EDD8;
+            font-size: 4.5rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 60px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .mockup-container {
+            width: 850px;
+            background: #0D2137;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            border: 2px solid rgba(42, 171, 181, 0.2);
+            transform: perspective(1000px) rotateX(5deg) scale(1.1);
+        }
+
+        /* Mockup Header */
+        .mockup-header {
+            background: #1A3A5C;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-logo {
+            width: 40px; height: 40px; border-radius: 50%; background: #2AABB5;
+        }
+        .brand-text { color: #F5EDD8; font-size: 1.2rem; letter-spacing: 0.1em; }
+        
+        .mockup-content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .mockup-card {
+            background: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .card-label { font-family: monospace; color: #C4A882; font-size: 1rem; margin-bottom: 15px; letter-spacing: 0.1em; }
+        .card-value { font-size: 4rem; color: #F5EDD8; margin-bottom: 10px; }
+        .card-delta { font-family: monospace; color: #2AABB5; font-size: 1.2rem; }
+
+        .mockup-table {
+            margin: 0 40px 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 20px 30px;
+        }
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #F5EDD8;
+            font-size: 1.2rem;
+            align-items: center;
+        }
+        .row-light { color: #5A7A8C; font-family: monospace; }
+        .status-active { color: #4ECDC4; font-family: monospace; font-size: 1.1rem; }
+        .status-idle { color: #C4A882; font-family: monospace; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+    <div class="instagram-post">
+        <div class="tagline">LIQUID INTELLIGENCE</div>
+        <div class="title">DELPHANTIC CO.</div>
+
+        <div class="mockup-container">
+            <div class="mockup-header">
+                <div class="header-left">
+                    <div class="header-logo"></div>
+                    <div class="brand-text">DELPHANTIC KERNAL</div>
+                </div>
+                <div style="color:#C4A882; font-family:monospace; font-size:1.2rem;">ENTERPRISE ERP</div>
+            </div>
+
+            <div class="mockup-content">
+                <div class="mockup-card">
+                    <div class="card-label">Aktif Kullanıcı</div>
+                    <div class="card-value">1,402</div>
+                    <div class="card-delta">+12% bu ay</div>
+                </div>
+                <div class="mockup-card">
+                    <div class="card-label">Sistem Yükü</div>
+                    <div class="card-value">24%</div>
+                    <div class="card-delta" style="color: #4ECDC4;">Optimum</div>
+                </div>
+                <div class="mockup-card">
+                    <div class="card-label">İşlenen Veri</div>
+                    <div class="card-value">8.4T</div>
+                    <div class="card-delta">+1.2T bu ay</div>
+                </div>
+            </div>
+
+            <div class="mockup-table">
+                <div class="table-row" style="color:#5A7A8C; font-family:monospace; border-bottom:2px solid rgba(255,255,255,0.1);">
+                    <div>MODÜL</div><div>DURUM</div><div>SON GÜNCELLEME</div>
+                </div>
+                <div class="table-row">
+                    <div>Kernal Real Estate Engine</div>
+                    <div class="status-active">AKTİF (GHOST STATE)</div>
+                    <div class="row-light">Anlık</div>
+                </div>
+                <div class="table-row">
+                    <div>Smart Legal Contracts</div>
+                    <div class="status-idle">BEKLEMEDE</div>
+                    <div class="row-light">12 dk önce</div>
+                </div>
+                <div class="table-row" style="border:none;">
+                    <div>Kernal HR Autonomy</div>
+                    <div class="status-active">AKTİF</div>
+                    <div class="row-light">Anlık</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
