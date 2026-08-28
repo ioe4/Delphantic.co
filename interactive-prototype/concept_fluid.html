@@ -6,7 +6,7 @@
     <title>Delphantic - Liquid Intelligence</title>
     <style>
         /* Base Setup */
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #05101A; font-family: 'Georgia', serif; cursor: default; overflow-x: hidden; scroll-behavior: smooth; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background-color: #0D2540; font-family: 'Georgia', serif; cursor: default; overflow-x: hidden; scroll-behavior: smooth; }
         
         /* Fixed Background Canvases */
         #bgCanvas { display: none; }
@@ -14,7 +14,7 @@
         #dolphinCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 0; filter: blur(4px); pointer-events: none; }
         
         /* A dark overlay that gets darker as you scroll down for readability */
-        .scroll-fade { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(to bottom, transparent, rgba(5, 16, 26, 0.9)); z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+        .scroll-fade { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(to bottom, transparent, rgba(13, 37, 64, 0.9)); z-index: 2; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
 
         /* UI OVERLAYS (Fixed) */
         .ui-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 100; pointer-events: none; }
@@ -26,13 +26,13 @@
         .menu-btn:hover span { width: 35px; background-color: #C4A882; }
         .menu-btn.active span:nth-child(1) { transform: translateY(5px) rotate(45deg); width: 35px; }
         .menu-btn.active span:nth-child(2) { transform: translateY(-5px) rotate(-45deg); width: 35px; }
-        .menu-dropdown { position: absolute; top: 90px; right: 40px; width: 280px; background: rgba(8, 20, 33, 0.6); border: 1px solid rgba(42, 171, 181, 0.15); border-radius: 16px; backdrop-filter: blur(20px); padding: 20px 0; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .menu-dropdown { position: absolute; top: 90px; right: 40px; width: 280px; background: rgba(15, 35, 60, 0.6); border: 1px solid rgba(42, 171, 181, 0.15); border-radius: 16px; backdrop-filter: blur(20px); padding: 20px 0; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         .menu-dropdown.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .menu-item { padding: 16px 30px; font-family: monospace; letter-spacing: 0.2em; font-size: 0.8rem; color: #A0B4C0; cursor: pointer; transition: 0.3s; border-left: 0px solid #4ECDC4; }
         .menu-item:hover { color: #F5EDD8; background: linear-gradient(90deg, rgba(42, 171, 181, 0.15), transparent); padding-left: 40px; border-left: 4px solid #4ECDC4; }
         
-        .ticket-btn { position: absolute; bottom: 40px; right: 40px; width: 64px; height: 74px; background: rgba(13, 33, 55, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; justify-content: center; align-items: center; cursor: pointer; pointer-events: auto; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .ticket-btn:hover { background: rgba(13, 33, 55, 0.6); transform: translateY(-5px) scale(1.05); }
+        .ticket-btn { position: absolute; bottom: 40px; right: 40px; width: 64px; height: 74px; background: rgba(20, 50, 85, 0.3); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; justify-content: center; align-items: center; cursor: pointer; pointer-events: auto; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ticket-btn:hover { background: rgba(20, 50, 85, 0.6); transform: translateY(-5px) scale(1.05); }
         .ticket-btn svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .ticket-btn .hex-border { stroke: rgba(139, 115, 85, 0.6); stroke-width: 2; fill: none; transition: 0.3s; }
         .ticket-btn:hover .hex-border { stroke: #8B7355; }
@@ -68,7 +68,7 @@
         .revolut-section { position: relative; width: 100%; min-height: 400vh; }
         .sticky-container { position: sticky; top: 0; height: 100vh; width: 100%; overflow: hidden; pointer-events: none; display: flex; align-items: center; justify-content: flex-end; padding-right: 10%; box-sizing: border-box; }
         
-        .mockup-wrapper { position: absolute; width: 500px; height: 600px; background: rgba(13, 33, 55, 0.4); border: 1px solid rgba(42, 171, 181, 0.2); border-radius: 24px; backdrop-filter: blur(15px); box-shadow: 0 30px 60px rgba(0,0,0,0.5); display: flex; flex-direction: column; padding: 30px; box-sizing: border-box; opacity: 0; transform: translateY(100px) scale(0.95); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .mockup-wrapper { position: absolute; width: 500px; height: 600px; background: rgba(20, 50, 85, 0.4); border: 1px solid rgba(42, 171, 181, 0.2); border-radius: 24px; backdrop-filter: blur(15px); box-shadow: 0 30px 60px rgba(0,0,0,0.5); display: flex; flex-direction: column; padding: 30px; box-sizing: border-box; opacity: 0; transform: translateY(100px) scale(0.95); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .mockup-wrapper.active { opacity: 1; transform: translateY(0) scale(1); }
         
         .mockup-header { height: 40px; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
@@ -335,15 +335,15 @@
         }
 
         function drawBackground() {
-            bgCtx.fillStyle = '#05101A'; bgCtx.fillRect(0, 0, width, height);
+            bgCtx.fillStyle = '#0D2540'; bgCtx.fillRect(0, 0, width, height);
             for (let i = 0; i < 3; i++) {
                 const cx = width / 2 + Math.sin(i * 2) * (width * 0.3);
                 const cy = height / 2 + Math.cos(i) * (height * 0.4);
                 const radius = width * 0.6;
                 const gradient = bgCtx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-                if (i === 0) gradient.addColorStop(0, 'rgba(30, 95, 140, 0.4)'); 
-                if (i === 1) gradient.addColorStop(0, 'rgba(42, 171, 181, 0.2)'); 
-                if (i === 2) gradient.addColorStop(0, 'rgba(13, 33, 55, 0.8)'); 
+                if (i === 0) gradient.addColorStop(0, 'rgba(40, 120, 180, 0.5)'); 
+                if (i === 1) gradient.addColorStop(0, 'rgba(60, 190, 210, 0.3)'); 
+                if (i === 2) gradient.addColorStop(0, 'rgba(20, 55, 90, 0.75)'); 
                 gradient.addColorStop(1, 'transparent');
                 bgCtx.fillStyle = gradient; bgCtx.beginPath(); bgCtx.arc(cx, cy, radius, 0, Math.PI * 2); bgCtx.fill();
             }
@@ -394,7 +394,7 @@
                 const slope = Math.cos(time * 0.001 + this.phase) * 0.08 * this.direction;
                 dCtx.save(); dCtx.translate(this.x, this.y); dCtx.rotate(slope);
                 dCtx.scale(this.direction * this.scale, this.scale); dCtx.translate(-50, -50); 
-                dCtx.strokeStyle = 'rgba(13, 33, 55, 0.8)'; dCtx.lineWidth = 4; dCtx.lineCap = 'round'; dCtx.stroke(dolphinPath);
+                dCtx.strokeStyle = 'rgba(20, 55, 90, 0.8)'; dCtx.lineWidth = 4; dCtx.lineCap = 'round'; dCtx.stroke(dolphinPath);
                 dCtx.restore();
             }
         }
